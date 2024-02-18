@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athletics Scoreboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("https://th.bing.com/th/id/OIP.gSqSDbBqO5Pfs40h11iQcAHaEK?w=1920&h=1080&rs=1&pid=ImgDetMain");
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 3px solid #822c2c;
+            text-align: center;
+            padding: 10px;
+            color:white;
+
+        }
+        label{
+            color:aliceblue;
+            justify-content:space-between;
+        }
+
+        th {
+            background-color: #bea5a5;
+        }
+
+        #updateBtn, #quickUpdateBtn {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #af4c4f;
+            color: white;
+            cursor: pointer;
+        }
+
+        #participantName, #jumpingScore, #distanceUnit {
+            margin: 10px;
+            padding: 5px;
+        }
+
+        h1{
+            color:aliceblue;
+            text-align: center;
+        }
+        
+        .deleteBtn {
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<centere><h1>Athletics Scoreboard</h1></centere>
+
+<label for="participantName">Participant Name:</label>
+<input type="text" id="participantName">
+
+<label for="jumpingScore">Jumping Score:</label>
+<input type="number" step="0.01" id="jumpingScore">
+
+<label for="distanceUnit">Distance Unit:</label>
+<select id="distanceUnit">
+    <option value="meters">Meters</option>
+    <option value="feet">Feet</option>
+</select>
+
+<button id="updateBtn" onclick="addParticipant()">Add Participant</button>
+<button id="quickUpdateBtn" onclick="quickUpdate()">Quick Update</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Participant</th>
+            <th>Jumping Score</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody id="scoreboardBody">
+        <!-- Scores will be dynamically added here -->
+    </tbody>
+</table>
+
+<script>
+    var participants = [];
+
+    function addParticipant() {
+        var participantName = document.getElementById('participantName').value;
+        var jumpingScore = parseFloat(document.getElementById('jumpingScore').value);
+        var distanceUnit = document.getElementById('distanceUnit').value;
+
+        if (participantName && !isNaN(jumpingScore)) {
+            participants.push({ name: participantName, jumpingScore: jumpingScore, distanceUnit: distanceUnit });
+
+            // Sort participants by jumping scores
+            participants.sort((a, b) => b.jumpingScore - a.jumpingScore);
+
+            // Update the scoreboard
+            updateScores();
+
+            // Clear input fields
+            document.getElementById('participantName').value = '';
+            document.getElementById('jumpingScore').value = '';
+        } else {
+            alert('Please enter valid data for all fields.');
+        }
+    }
+
+    function quickUpdate() {
+        var jumpingScore = parseFloat(document.getElementById('jumpingScore').value);
+        var distanceUnit = document.getElementById('distanceUnit').value;
+
+        if (!isNaN(jumpingScore)) {
+            participants.forEach(participant => {
+                // Convert to meters if the unit is in feet
+                var scoreInMeters = distanceUnit === 'feet' ? jumpingScore * 0.3048 : jumpingScore;
+                participant.jumpingScore = scoreInMeters;
+            });
+
+            // Sort participants by jumping scores
+            participants.sort((a, b) => b.jumpingScore - a.jumpingScore);
+
+            // Update the scoreboard
+            updateScores();
+
+            // Clear input field
+            document.getElementById('jumpingScore').value = '';
+        } else {
+            alert('Please enter a valid jumping score.');
+        }
+    }
+
+    function deleteParticipant(index) {
+        var confirmation = confirm("Are you sure you want to delete this participant?");
+        if (confirmation) {
+            participants.splice(index, 1);
+            updateScores();
+        }
+    }
+
+    function updateScores() {
+        var scoreboardBody = document.getElementById('scoreboardBody');
+        scoreboardBody.innerHTML = '';
+
+        for (var i = 0; i < participants.length; i++) {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${i + 1}</td>
+                <td>${participants[i].name}</td>
+                <td>${participants[i].jumpingScore.toFixed(2)} meters</td>
+                <td><button class="deleteBtn" onclick="deleteParticipant(${i})">Delete</button></td>
+            `;
+            scoreboardBody.appendChild(row);
+        }
+    }
+</script>
+
+</body>
+</html>
